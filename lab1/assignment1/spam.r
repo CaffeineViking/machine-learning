@@ -77,4 +77,4 @@ pspecificity <- ptn / (pfp+ptn)
 
 plot(1 - kspecificity, ksensitivity, xlim=c(0.05,0.95), ylim=c(0.05,0.95), xlab="Specificity", ylab="Sensitivity")
 lines(1 - kspecificity, ksensitivity, col="Orange") ; lines(1 - pspecificity, psensitivity, col="Purple");
-legend(x = "bottomright", c("knearest", "kknn"), lty = c(1,1), lwd = c(1,1), col=c("Orange", "Purple"))
+legend(x = "bottomright", c("knearest", "kknn"), lty = c(1,1), lwd = c(2,2), col=c("Orange", "Purple"))
