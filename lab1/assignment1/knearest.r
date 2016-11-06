@@ -26,6 +26,6 @@ knearest <- function(train, k, test) {
     spamv <- apply(sorted_distance_ids, 1, spam, train)
     kspam_vector <- spamv[,1:k] # Select only first K.
     mean_spam <- rowMeans(data.matrix(kspam_vector))
-    # Spam if >0.5, not-spam iff <=0.5.
-    return(round(mean_spam))
+    # Still need to classify data by e.g. >0.5 -> 1.
+    return(mean_spam) # This step is done in spam.r.
 }
