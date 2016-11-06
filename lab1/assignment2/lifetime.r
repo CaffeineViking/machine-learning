@@ -48,3 +48,7 @@ legend(x = "bottomleft", c("loge-likelihood, |x| = 48",
                            "post-likelihood, |x| = 48"),
        lty = c(1,1), lwd = c(2,2),
        col=c("Orange", "Purple", "Green"))
+
+random_exponential <- rexp(50, mle)
+hist(random_exponential, main="Histogram over X~Exp of Full Log-Likelihood Estimation",
+     xlab = "Expected Machine Lifetime", ylab="Frequency of Machine Lifetime")
