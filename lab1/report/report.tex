@@ -53,7 +53,7 @@
         d(X,Y) = 1 - \frac{X^TY}{\sqrt{\sum_i{X_i^2}}\sqrt{\sum_i{Y_i^2}}}
     \end{equation}
 
-    After defining the distance function $d(X,Y)$, one can find the \emph{e-mail/message distance} for each $Y_j$ in respect to each $X_i$. Where $X$ is the \emph{testing set} and $Y$ the \emph{training set}. Each row of the resulting matrix contains contains the distance between $X_i$ and $\forall Y_j$. Therefore, sorting each row $X_i$ and picking the first $K$ elements gives the $K$ \emph{closest messages} from the \emph{training set} in respect to each \emph{testing element}. By using this, the \emph{k-nearest neighbors} can be found, and the prediction of $\hat{Y}$ (spam, not spam) is done by using Equation~\ref{eq:knn}, where $K_i$ classify as being $C_i$.
+    After defining the distance function $d(X,Y)$, one can find the \emph{e-mail/message distance} for each $Y_j$ in respect to each $X_i$. Where $X$ is the \emph{testing set} and $Y$ the \emph{training set}. Each row of the resulting matrix contains the relative distance between $X_i$ and $\forall Y_j$. Therefore, sorting each row $X_i$ and picking the first $K$ elements gives the $K$ \emph{closest messages} from the \emph{training set} in respect to each \emph{testing element}. By using this, the \emph{k-nearest neighbors} can be found, and the prediction of $\hat{Y}$ (spam, not spam) is done by using Equation~\ref{eq:knn}, where $K_i$ classify as being $C_i$.
 
     \begin{equation} \label{eq:knn}
         \hat{Y} = \underset{\forall C_i}{\mathrm{max}}\; p(C_i | \bm{x}),\; p(C_i | \bm{x}) \propto K_i \div K
@@ -92,24 +92,46 @@
 
     \section*{Assignment 2}
 
-    ...
+    Knowing how to \emph{infer} what parameter $\theta$ most likely produced a already given data vector $\bm{x}$ is useful to gain more information about underlying processes. In this case, that is \emph{expected lifetime of machines}, which has been assumed to follow $p(\bm{x} | \theta) = \theta e^{-\theta x}$, where $\bm{x}$ are the \emph{expected lifetimes} of $n$ machines, which are independent and identically distributed. The P.D.F. $\theta e^{-\theta x}$ is from a \emph{exponential distribution}, as seen in \emph{Jonsson et al.}~\cite{jonsson1999ett}: $X \sim \mathrm{Exp}(\mu, \sigma^2)$...
 
-    % \begin{table}[h]
-    % \begin{center}
-    % \begin{tabular}{lc}
-    %     \toprule
-    %         \textbf{Exp.\ Distribution} & \textbf{MLE} \\
-    %     \midrule
-    %         $p(\bm{x}|\theta), |\bm{x}|=48$ & 1.1 \\
-    %         $p(\bm{x}|\theta), |\bm{x}|=6$ & 1.8 \\
-    %         $p(\bm{x}|\theta)p(\theta), |\bm{x}|=48$ & 0.9 \\
-    %     \bottomrule
-    % \end{tabular}
-    % \end{center}
-    % \end{table}
+    Estimation of the parameter $\theta$ can be done with \emph{MLE (Maximum Likelihood Estimation)}, which is usually done by using the \emph{log-likelihood} of $\theta$ for a given data vector $\bm{x}$. The formula for \emph{log-likelihood} is shown in Equation~\ref{eq:mle}, where the parameter $\theta$ can then be estimated with $\hat{\theta}_{mle}$ by selecting the most probable $\theta$ from a given set of thetas $\Theta, \theta_i \in \Theta$, by \emph{maximizing} the \emph{average log-likelihood}, as in Eq. 4. This is seen in e.g. \emph{Myung}~\cite{myung2003tutorial} and \emph{Wikipedia}.
 
-    % \includegraphics[width=0.5\textwidth]{share/machine.eps}
-    % \includegraphics[width=0.5\textwidth]{share/histogram.eps}
+    \begin{gather} \label{eq:mle}
+        \mathcal{L}(\theta ; \bm{x}) = \mathrm{ln}\, p(\bm{x}|\theta) = \sum_{i=1}^{n}\mathrm{ln}\, p(x_i | \theta) \\
+        \hat{\theta}_{mle} = \underset{\forall \theta}{\mathrm{max}}\, \mathcal{\hat{L}}(\theta ; \bm{x}),\; \mathcal{\hat{L}} = \frac{\mathrm{ln}\, p(\bm{x}|\theta)}{n}
+    \end{gather}
+
+    The actual implementation of these is found in Listing~\ref{lst:likelihood}, in the \emph{R} functions \texttt{lnlikelihood} and \texttt{distribution} (gives $\theta e^{-\theta x_i},\, \forall x_i \in \bm{x}$). For the MLE, lines \texttt{7-9} in Listing~\ref{lst:lifetime} calculate the \emph{average log-likelihood} and then picks the \emph{most probable} $\theta_i$. The MLE for the dataset shown in Listing~\ref{lst:machines} for when the \emph{entire dataset} is used, and when only $|\bm{x}| = 6$ is taken, is shown in the table to the right. As can be seen in the graph to the right, the $\hat{\theta}_{mle}$ for when $|\bm{x}| = 6$ will overshoot the value for when the actual full dataset is used, therefore, it is less reliable then when $|\bm{x}| = 48$, not a good estimator.
+
+    If additional information is know about the distribution, in this case $p(\theta) = \lambda e^{-\lambda \theta}$ where $\lambda=10$, the \emph{MAP (Maximum a Posteriori)} estimation can be used instead. The implementation can be found in Listing~\ref{lst:likelihood}, in the \emph{R} function \texttt{polikelihood}. The MAP for the $\bm{x}$ dataset is shown in the table, and the graph for it is the green line to the right. Finally, taking random samples from the distribution with $\hat{\theta}_{mle}$ produces the histogram to the right.
+
+    In conclusion, the parameter $\hat{\theta}_{mle}$ is a very good estimator for $\bm{x}$ given the Exp. distribution $p(\bm{x} | \theta)$.
+
+    \newpage
+
+    \begin{table}[h!]
+    \begin{center}
+    \begin{tabular}{lc}
+        \toprule
+            \textbf{Exp.\ Distribution} & \textbf{MLE/MAP} \\
+        \midrule
+            $p(\bm{x}|\theta), |\bm{x}|=48$ & 1.1 \\
+            $p(\bm{x}|\theta), |\bm{x}|=6$ & 1.8 \\
+            $p(\bm{x}|\theta)p(\theta), |\bm{x}|=48$ & 0.9 \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    \end{table}
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{share/machine.eps}
+    \end{figure}
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.5\textwidth]{share/histogram.eps}
+    \end{figure}
 
     \clearpage \nocite{*}
     \bibliographystyle{alpha}
