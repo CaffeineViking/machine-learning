@@ -2,6 +2,18 @@ library("kknn")
 source("distance.r")
 source("knearest.r")
 
+sensitivity <- function(x, y) {
+    tp <- sum(x == 1 & y == 1)
+    fn <- sum(x == 0 & y == 1)
+    return(tp / (tp + fn))
+}
+
+specificity <- function(x, y) {
+    tn <- sum(x == 0 & y == 0)
+    fp <- sum(x == 1 & y == 0)
+    return(tn / (tn + fp))
+}
+
 set.seed(12345) # For debugging.
 data <- read.csv("spambase.csv")
 # Pick randomly around half of the rows in dataset.
@@ -52,29 +64,21 @@ mc1 <- 1 - sum(diag(cm1)) / sum(cm1)
 # Report confusion matrix and error.
 print(cm1) ; print(mc1)
 
+# Classify dataset by 0.05 steps...
 response <- testing[,ncol(testing)]
 classify <- seq(0.05, 0.95, by=0.05)
+# Apply the classification rule for all.
 kc5 <- sapply(k5, function(x) x > classify)
 pc5 <- sapply(p5, function(x) x > classify)
 
-# For our knearest algorithm.
-# Calculate value in ROC curve.
-ktp <- rowSums(kc5 == 1 & response == 1)
-kfn <- rowSums(kc5 == 0 & response == 1)
-ksensitivity <- ktp / (ktp+kfn)
-ktn <- rowSums(kc5 == 0 & response == 0)
-kfp <- rowSums(kc5 == 1 & response == 0)
-kspecificity <- ktn / (kfp+ktn)
+# Find the sensitivity and specificity of knearest.
+ksensitivity <- apply(kc5, 1, sensitivity, response)
+kspecificity <- apply(kc5, 1, specificity, response)
+psensitivity <- apply(pc5, 1, sensitivity, response)
+pspecificity <- apply(pc5, 1, specificity, response)
 
-# For the kknn library stuff.
-# Calculate value in ROC curve.
-ptp <- rowSums(pc5 == 1 & response == 1)
-pfn <- rowSums(pc5 == 0 & response == 1)
-psensitivity <- ptp / (ptp+pfn)
-ptn <- rowSums(pc5 == 0 & response == 0)
-pfp <- rowSums(pc5 == 1 & response == 0)
-pspecificity <- ptn / (pfp+ptn)
-
-plot(1 - kspecificity, ksensitivity, xlim=c(0.05,0.95), ylim=c(0.05,0.95), xlab="Specificity", ylab="Sensitivity")
-lines(1 - kspecificity, ksensitivity, col="Orange") ; lines(1 - pspecificity, psensitivity, col="Purple");
+plot(1 - kspecificity, ksensitivity, xlim=c(0.05,0.95), ylim=c(0.05,0.95), xlab="Specificity", ylab="Sensitivity", type='l')
+lines(1 - kspecificity, ksensitivity, col="Orange") ; lines(1 - pspecificity, psensitivity, col="Purple") 
 legend(x = "bottomright", c("knearest", "kknn"), lty = c(1,1), lwd = c(2,2), col=c("Orange", "Purple"))
+lines(0:1, 0:1, col="Red", xlim=c(0.05, 0.95), ylim=c(0.05,0.95))
+title("ROC Curve for the K-NN Spam Predictors")
