@@ -61,7 +61,7 @@
 
     The \emph{k-nearest neighbor algorithm} is implemented in Listing~\ref{lst:knearest}, in the function \texttt{knearest(t,k,t')}. It works as previously described, where line \texttt{20} is calculating the \emph{distance matrix} and line \texttt{21} sorting each row, so that all $Y$ distances are relative to $X_i$. Thereafter, in line \texttt{26-27} the classification is found for the $K$-nearest neighbors of $X_i$. The \emph{mean} value is then taken, which is equivalent to $K_i \div K$ since only two classifications exist (spam and not spam), following a \emph{Cover et al.}~\cite{cover1967nearest} K-NN descriptions.
 
-    Below follow \emph{confusion matrices} \& \emph{ROC curves}.
+    Below follow \emph{confusion matrices} \& \emph{ROC curves}, and it seems \emph{knearest} gives better results than \emph{kknn}.
 
     \begin{table}[h]
     \begin{center}
@@ -88,7 +88,10 @@
     \end{center}
     \end{table}
 
-    \includegraphics[width=0.5\textwidth]{share/spam.eps}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.42\textwidth]{share/spam.eps}
+    \end{figure}
 
     \section*{Assignment 2}
 
