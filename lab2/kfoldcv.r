@@ -28,10 +28,9 @@ disjoin <- function(X, k) {
 # x and y targets. Returns,
 # the average count of hit.
 egerror <- function(x, y) {
-    targets <- length(x)
-    nmatching <- (x  !=  y)
-    nsums <- sum(nmatching)
-    return(nsums / targets)
+    targets <- length(x)^2
+    sdiff <- sum(x^2 - y^2)
+    return(sdiff / targets)
 }
 
 # ------kfoldcv(X, y, k)-------
@@ -45,9 +44,23 @@ egerror <- function(x, y) {
 kfoldcv <- function(X, y, k)  {
     kfolding <- 1:k
     sets <- disjoin(X, k)
-    for (i in kfolding) {
-        iset <- sets[-i,] # Remove 'i'
-        Xi <- X[iset,] ; yi <- y[iset]
-        prediction <- linrhat(Xi, yi)
+    ege <- c() # Empty...
+    for (i in kfolding) { # Every set.
+        kset <- sets[-i,] # Remove 'i'
+        iset <- sets[i,]  # Only  'i'.
+        # Pick dataset for all but 'i'
+        Xi <- X[kset,] ; yi <- y[kset]
+        # Estimated parameters w. Xi.
+        hypothesis <- linrhat(Xi, yi)
+        # Predict for the unused 'i'.
+        p <- X[iset,]%*%hypothesis
+        # Esimate error of this.
+        e <- egerror(p, y[iset])
+        # Add to list of these.
+        ege <- c(ege, abs(e))
     }
+
+    # Oh yea baby,
+    # average errors.
+    return(mean(ege))
 }
