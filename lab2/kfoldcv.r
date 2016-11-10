@@ -1,3 +1,5 @@
+source("linrhat.r")
+
 # ------disjoin(X, k)------
 # Produce n/k disjoint sets
 # of the training matrix X.
@@ -19,6 +21,19 @@ disjoin <- function(X, k) {
     return(S)
 }
 
+# ------egerror(x, y)------
+# Locate the generalization
+# error within in our model
+# by comparing the results:
+# x and y targets. Returns,
+# the average count of hit.
+egerror <- function(x, y) {
+    targets <- length(x)
+    nmatching <- (x  !=  y)
+    nsums <- sum(nmatching)
+    return(nsums / targets)
+}
+
 # ------kfoldcv(X, y, k)-------
 # Returns the estimated genera-
 # lization error of the feature
@@ -28,4 +43,11 @@ disjoin <- function(X, k) {
 # method, splitting X randomly,
 # gives k disjoint subets of X.
 kfoldcv <- function(X, y, k)  {
+    kfolding <- 1:k
+    sets <- disjoin(X, k)
+    for (i in kfolding) {
+        iset <- sets[-i,] # Remove 'i'
+        Xi <- X[iset,] ; yi <- y[iset]
+        prediction <- linrhat(Xi, yi)
+    }
 }
