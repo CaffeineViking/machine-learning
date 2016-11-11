@@ -1,7 +1,7 @@
 source("linrhat.r")
 
 # ------disjoin(X, k)------
-# Produce n/k disjoint sets
+# Produce a k disjoint sets
 # of the training matrix X.
 # Useful for kfoldcv below.
 # Note: only returns index.
@@ -25,11 +25,12 @@ disjoin <- function(X, k) {
 # Locate the generalization
 # error within in our model
 # by comparing the results:
-# x and y targets. Returns,
-# the average count of hit.
+# x and y targets. Returns:
+# the difference for x & y.
 egerror <- function(x, y) {
     targets <- length(x)^2
-    sdiff <- sum(x^2 - y^2)
+    # Using a residual sum.
+    sdiff <- sum((x - y)^2)
     return(sdiff / targets)
 }
 
@@ -44,7 +45,7 @@ egerror <- function(x, y) {
 kfoldcv <- function(X, y, k)  {
     kfolding <- 1:k
     sets <- disjoin(X, k)
-    ege <- c() # Empty...
+    ege <- c() # Empty set of errors.
     for (i in kfolding) { # Every set.
         kset <- sets[-i,] # Remove 'i'
         iset <- sets[i,]  # Only  'i'.
