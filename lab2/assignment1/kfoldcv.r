@@ -28,8 +28,8 @@ disjoin <- function(X, k) {
 # x and y targets. Returns:
 # the difference for x & y.
 egerror <- function(x, y) {
-    targets <- length(x)^2
-    # Using a residual sum.
+    targets <- length(x)
+    # Using good old MSE...
     sdiff <- sum((x - y)^2)
     return(sdiff / targets)
 }
