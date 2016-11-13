@@ -1,3 +1,4 @@
+library("ggplot2")
 source("kfoldcv.r")
 
 # ------kfold(i, X, y, k)------
@@ -40,6 +41,32 @@ featsel <- function(X, y, k) {
     }
 
     # Best features.
-    cat("Error: ", lowerror, "\n")
     return(features)
 }
+
+set.seed(12345)
+X <- data.matrix(swiss[,-1])
+y <- data.matrix(swiss[,1]);
+features <- featsel(X, y, 5)
+X <- data.matrix(X[,features])
+what <- linrhat(X, y)
+yhat <- X %*% what
+
+graph <- data.frame(X)
+graph$Fertility <- yhat
+
+setEPS()
+postscript("education.eps")
+plot(graph$Education, graph$Fertility,
+   xlab="Education", ylab="Fertility")
+dev.off()
+
+postscript("catholic.eps")
+plot(graph$Catholic, graph$Fertility,
+   xlab="Catholic", ylab="Fertility")
+dev.off()
+
+postscript("mortality.eps")
+plot(graph$Infant.Mortality, graph$Fertility,
+   xlab="Infant Mortality", ylab="Fertility")
+dev.off()

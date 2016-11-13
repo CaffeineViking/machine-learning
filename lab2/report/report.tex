@@ -1,0 +1,90 @@
+\documentclass[a4paper, twocolumn]{article}
+\usepackage[pdftex, hidelinks,
+            pdftitle={Report},
+            pdfauthor={Erik S. Vasconcelos Jansson},
+            pdfsubject={Report},
+            pdfkeywords={report}]{hyperref}
+
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage{courier}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{mathtools}
+\lstset{basicstyle=\footnotesize\ttfamily,
+        breakatwhitespace = false,
+        breaklines = true,
+        keepspaces = true,
+        language = C++,
+        showspaces = false,
+        showstringspaces = false,
+        belowcaptionskip = \bigskipamount,
+        framerule = 0.80pt,
+        frame = tb,
+        numbers = left,
+        belowskip = \bigskipamount,
+        escapeinside={<@}{@>}}
+
+\title{Introduction to Machine Learning \\
+       Individual Laboration Report --2--}
+\author{{Erik Sven Vasconcelos Jansson} \\
+        {\href{mailto:erija578@student.liu.se}
+        {\texttt{erija578@student.liu.se}}} \\
+        {Linköping University, \, Sweden}}
+
+\begin{document}
+    \pagenumbering{arabic}
+    \maketitle % Titles...
+
+    \section*{Assignment 1}
+
+    \begin{table}[h!]
+    \begin{center}
+    \begin{tabular}{lc}
+        \toprule
+            \textbf{Feature Selection} & \textbf{M.S.E.} \\
+        \midrule
+            $\{3, 4, 5\}$ & $90.6202$ \\
+            $\{1\}$ & $105.566$ \\
+            $\{1, 3, 4, 5\}$ & $111.411$ \\
+            $\{1, 2, 3, 5\}$ & $117.092$ \\
+            $\{1, 3, 5\}$ & $120.170$ \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    \label{tbl:featsel}
+    \caption{where 1 $\rightarrow$ \emph{Agriculture}, 2 $\rightarrow$ \emph{Examination}, 3 $\rightarrow$ \emph{Education}, 4 $\rightarrow$ \emph{Catholic}, 5 $\rightarrow$ \emph{Infant Mortality}. Describes lowest expected error feature selections...}
+    \end{table}
+
+    \newpage
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.3\textwidth]{share/education.eps}
+        \includegraphics[width=0.3\textwidth]{share/catholic.eps}
+        \includegraphics[width=0.3\textwidth]{share/mortality.eps}
+    \end{figure}
+
+    \newpage
+
+    \section*{Assignment 2}
+
+    ...
+
+    \clearpage \nocite{*}
+    \bibliographystyle{alpha}
+    \bibliography{report}
+
+    \onecolumn \appendix
+    \section*{Appendix}
+
+    ...
+
+\end{document}
