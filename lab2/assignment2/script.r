@@ -1,4 +1,5 @@
 library("MASS")
+library("glmnet")
 data <- read.csv("tecator.csv");
 data_matrix <- data.matrix(data)
 
@@ -65,3 +66,23 @@ dev.off()
 model <- lm(Fat ~ . - Moisture - Protein, data)
 feature_selection <- stepAIC(model, direction="both")
 # How many were selected? Answer: 64,  coeffiecients.
+
+y <- data_matrix[,102] # Select Fat as the only response...
+X <- data_matrix[,2:101] # Select Channel1-Channel-100 features.
+ridge <- glmnet(X, y, alpha = 0) # Fit with the Ridge regression.
+lasso <- glmnet(X, y, alpha = 1) # Fit with the Lasso regression.
+
+setEPS()
+postscript("ridge.eps")
+# Explicit about x-axis variable.
+plot(ridge, xvar="lambda", label=TRUE)
+dev.off()
+
+setEPS()
+postscript("lasso.eps")
+# Explicit about x-axis variable.
+plot(lasso, xvar="lambda", label=TRUE)
+dev.off()
+
+kfoldcv <- cv.glmnet(X, y,  type.measure="mse", nfolds=20)
+feature_selection <- coef(kfoldcv, s = "lambda.min")

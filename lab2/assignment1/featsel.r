@@ -19,6 +19,8 @@ kfold <- function(i, X, y, k) {
 featsel <- function(X, y, k) {
     features <- c() # Nothing.
     lowerror <- Inf # Not good
+    relation <- data.frame(K   = 1:k,
+                           MSE = c(0))
     for (i in 1:k) { # Wrapper
         # Produce all combins.
         fi <- t(combn(1:k, i))
@@ -33,6 +35,7 @@ featsel <- function(X, y, k) {
         fea <- fi[order(ei),]
         fea<-data.matrix(fea)
 
+        relation$MSE[i]<-mean(err)
         # Update best estimates.
         if (lowerror > err[1]) {
             lowerror <- err[1];
@@ -40,6 +43,13 @@ featsel <- function(X, y, k) {
         }
     }
 
+    # Plot relation k v.s. M.S.E.
+    setEPS()
+    postscript("kvsmse.eps")
+    plot(relation$K, relation$MSE,
+         type="both", xlab="k-cv",
+         ylab = "M.S.E.")
+    dev.off() # Write...
     # Best features.
     return(features)
 }
