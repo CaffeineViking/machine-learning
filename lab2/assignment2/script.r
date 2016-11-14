@@ -78,11 +78,36 @@ postscript("ridge.eps")
 plot(ridge, xvar="lambda", label=TRUE)
 dev.off()
 
+# Report on how the coeffiecients change with lambda.
+# Answer: ridge penalizes all features equally with lambda.
+# Therefore, it will take longer to coverge all features...
+
 setEPS()
 postscript("lasso.eps")
 # Explicit about x-axis variable.
 plot(lasso, xvar="lambda", label=TRUE)
 dev.off()
 
+# Conclusions on the Ridge vs Lasso resulting plots?
+# Answer: the Lasso regression seems to converge individual
+# features, therefore converging faster, towards the values
+# of some features. While Ridge converges simultaniously...
+
 kfoldcv <- cv.glmnet(X, y,  type.measure="mse", nfolds=20)
 feature_selection <- coef(kfoldcv, s = "lambda.min")
+
+# Report the optimal lambda and how many variables were selected.
+# Answer: the optimal lambda was 0.02985605 and 14 were selected.
+# Conclusions: the interval area shown in the graph shows optimal
+# number of feature selections,  basically with the lowest M.S.E.
+
+setEPS()
+postscript("kfold.eps")
+plot(kfoldcv)
+dev.off()
+
+# Compare the results from steps (4) and (7). Basically, compare
+# stepAIC() and the glmnet CV (using k-fold).    Answer: stepAIC
+# gives a lot of features, 64 for the selection, while glmnet cv
+# for Lasso gives 13 features. Therefore, stepAIC() seems to not
+# penalize the features very well, and therefore chooses more...

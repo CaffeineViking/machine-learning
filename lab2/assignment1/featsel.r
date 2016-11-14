@@ -43,9 +43,9 @@ featsel <- function(X, y, k) {
         }
     }
 
-    # Plot relation k v.s. M.S.E.
     setEPS()
     postscript("kvsmse.eps")
+    # Plot relation k v.s. M.S.E.
     plot(relation$K, relation$MSE,
          type="both", xlab="k-cv",
          ylab = "M.S.E.")
