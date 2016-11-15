@@ -45,6 +45,12 @@
 
     \section*{Assignment 1}
 
+    Reducing the amount of relevant features by using \emph{feature selection} is an important task in \emph{supervised machine learning}. Since many features $\mathcal{F}_i$ are more relevant than others, producing the optimal feature set $\mathcal{\hat{F}} \subseteq \mathcal{F}$, reducing $|\mathcal{F}|$, while also $\hat{\varepsilon}(\mathbf{\hat{y}}, \mathbf{y})$, the \emph{Mean Squared Error (M.S.E)}. Here, we build a \emph{brute-force feature selection} for \emph{linear models}, using \emph{k-folds cross validation} for ranking feature subsets.
+
+    First, every possible feature combination $\mathcal{F}_i \subseteq \mathcal{F}$ is generated. Thereafter, each $\mathcal{F}_i$ is tested through \emph{k-fold cross-validation}, giving the \emph{mean $\hat{\varepsilon}_i(\mathbf{\hat{y}}, \mathbf{y})$} of the feature subset $\mathcal{F}_i$. By picking the feature subset $\mathcal{F}_i$ which produces $\mathrm{min}_i\; \hat{\varepsilon}_i(\mathbf{\hat{y}}, \mathbf{y})$, the best features are picked. In Listing~\ref{lst:featsel} line \texttt{26} we generate all $\mathcal{F}_i$, which are then cross-validated in lines \texttt{30-31}, then in lines \texttt{34-43} the best feature subset $\hat{\mathcal{F}}$ is given by evaluating the errors $\mathrm{min}_i\; \hat{\varepsilon}_i(\mathbf{\hat{y}}, \mathbf{y})$, where $\hat{\mathcal{F}} = \mathcal{F}_i$.
+
+    Now, how \emph{k-fold cross validation} works is shown. Roughly, Algorithm~\ref{alg:kfoldcv} demonstrates these steps, by giving each individual $\mathcal{F}_i$ and respective $X_{\mathcal{F}_i}$, $\mathbf{y}_{\mathcal{F}_i}$ as arguments, the \emph{feature matrix} and \emph{target vector}. For each $\mathcal{F}_i$ and \emph{k-fold iteration}, a \emph{linear hypothesis function} is trained, predicting $\hat{\mathbf{y}}$ using Equations~\ref{eq:linrhat}. Thereafter, the \emph{M.S.E} of the prediction $\hat{\varepsilon}_i(\mathbf{\hat{y}}, \mathbf{y})$, is calculated by using Equation~\ref{eq:mse}. Finally, the \emph{mean} of these $\hat{\varepsilon}_i(\mathbf{\hat{y}}, \mathbf{y})$ is the result of $\mathcal{F}_i$ cross-validation.
+
     \begin{gather} \label{eq:linrhat}
         \mathbf{\hat{w}}^{}_t = (X_t^\intercal X^{}_t)^{-1} X_t^\intercal \mathbf{y}^{}_t \\
         \mathbf{\hat{y}}^{}_v = X^{}_v \mathbf{\hat{w}}^{}_t
@@ -75,60 +81,64 @@
     \end{algorithmic}
     \end{algorithm}
 
-    % \begin{table}[h!]
-    % \begin{center}
-    % \begin{tabular}{lc}
-    %     \toprule
-    %         \textbf{Feature Selection} & \textbf{M.S.E.} \\
-    %     \midrule
-    %         $\{3, 4, 5\}$ & $90.6202$ \\
-    %         $\{1\}$ & $105.566$ \\
-    %         $\{1, 3, 4, 5\}$ & $111.411$ \\
-    %         $\{1, 2, 3, 5\}$ & $117.092$ \\
-    %         $\{1, 3, 5\}$ & $120.170$ \\
-    %     \bottomrule
-    % \end{tabular}
-    % \end{center}
-    % \label{tbl:featsel}
-    % \caption{where 1 $\rightarrow$ \emph{Agriculture}, 2 $\rightarrow$ \emph{Examination}, 3 $\rightarrow$ \emph{Education}, 4 $\rightarrow$ \emph{Catholic}, 5 $\rightarrow$ \emph{Infant Mortality}. Describes lowest expected error feature selections...}
-    % \end{table}
+    The implementation of \emph{feature selection} is found under Listing~\ref{lst:featsel}, while \emph{k-fold cross-validation} should be found in Listing~\ref{lst:kfoldcv}, \emph{linear regression} in Listing~\ref{lst:linrhat}. Most information was derived from \emph{Andrew Ng's Regularization \& Model Selection Handouts}~\cite{ng2016notes}.
 
-    % \begin{figure}[h!]
-    %     \centering
-    %     \includegraphics[width=0.3\textwidth]{share/education.eps}
-    %     \includegraphics[width=0.3\textwidth]{share/catholic.eps}
-    %     \includegraphics[width=0.3\textwidth]{share/mortality.eps}
-    % \end{figure}
+    Finally, testing the \emph{swiss dataset} on our \emph{feature selection} implementation where $\mathcal{F} = \mathcal{U} - \mathrm{Fertility}$, gives $\hat{\mathcal{F}} = \{3, 4, 5\}$, also shown in the Table~\ref{table:featsel} below. Our $\hat{\mathcal{F}}$ seems reasonable, being \emph{Catholic} is usually attributed with \emph{low abortion rate}, \emph{Infant Mortality} is directly linearly related as can be seen in the plot.
 
-    % \begin{figure}[h!]
-    %     \centering
-    %     \label{fig:kvsmse}
-    %     \caption{displays the relationships between feature subsets of \emph{Size K} and their \emph{Average $M.S.E$}. Notice that the \emph{expected error decreases} by \emph{increases in k}.}
-    %     \includegraphics[width=0.36\textwidth]
-    %     {share/kvsmse.eps}
-    % \end{figure}
+    \begin{table}[h!]
+    \begin{center}
+    \begin{tabular}{lc}
+        \toprule
+            \textbf{Feature Selection} & \textbf{M.S.E.} \\
+        \midrule
+            $\{3, 4, 5\}$ & $90.6202$ \\
+            $\{1, 3, 4, 5\}$ & $111.411$ \\
+            $\{1, 2, 3, 5\}$ & $117.092$ \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    \caption{where 1 $\rightarrow$ \emph{Agriculture}, 2 $\rightarrow$ \emph{Examination}, 3 $\rightarrow$ \emph{Education}, 4 $\rightarrow$ \emph{Catholic}, 5 $\rightarrow$ \emph{Infant Mortality}.}
+    \label{table:featsel}
+    \end{table}
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.26\textwidth]{share/education.eps}
+        \includegraphics[width=0.26\textwidth]{share/catholic.eps}
+        \includegraphics[width=0.26\textwidth]{share/mortality.eps}
+    \end{figure}
+
+    \begin{figure}[h!]
+        \centering
+        \label{fig:kvsmse}
+        \caption{displays the relationships between feature subsets of \emph{Size K} and their \emph{Average $M.S.E$}. Notice that the \emph{expected error decreases} by \emph{increases in k}.}
+        \includegraphics[width=0.36\textwidth]
+        {share/kvsmse.eps}
+    \end{figure}
+
+    \newpage
 
     \section*{Assignment 2}
+
+    \begin{figure}[h!]
+        \centering
+        \label{fig:linear}
+        \caption{relationship seems very close to linear. \emph{Protein} and \emph{Moisture} seem to be related somehow, at least in the provided meat observation datasets.}
+        \includegraphics[width=0.32\textwidth]
+        {share/linear.eps}
+    \end{figure}
 
     \begin{equation} \label{eq:mse}
         \mathrm{Moisture} \sim \mathcal{N}(w_0 + \sum_{i=1}^6{(w_i^i \cdot \mathrm{Protein}_i)}, \sigma^2)
     \end{equation}
 
-    % \begin{figure}[h!]
-    %     \centering
-    %     \label{fig:linear}
-    %     \caption{relationship seems very close to linear. \emph{Protein} and \emph{Moisture} seem to be related somehow, at least in the provided meat observation datasets.}
-    %     \includegraphics[width=0.36\textwidth]
-    %     {share/linear.eps}
-    % \end{figure}
-
-    % \begin{figure}[h!]
-    %     \centering
-    %     \label{fig:depends}
-    %     \caption{increasing complexity for the \emph{$i^{th}$ Model} seems to generate \emph{bias} towards the \emph{training dataset}, motivating the higher \emph{validation dataset} error rate.}
-    %     \includegraphics[width=0.36\textwidth]
-    %     {share/depends.eps}
-    % \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \label{fig:depends}
+        \caption{increasing complexity for the \emph{$i^{th}$ Model} seems to generate \emph{bias} towards the \emph{training dataset}, motivating the higher \emph{validation dataset} error rate.}
+        \includegraphics[width=0.32\textwidth]
+        {share/depends.eps}
+    \end{figure}
 
     % \begin{figure}[h!]
     %     \centering

@@ -41,10 +41,10 @@ for (degree in polynomials) {
 setEPS()
 postscript("depends.eps")
 plot(imse$Model, imse$Training.MSE,
-     xlab="Model", ylab="M.S.E.", "p", col="purple",
+     xlab="Model", ylab="M.S.E.", "b", col="purple",
      ylim=c(31.0, 34.0))
 points(imse$Model, imse$Validation.MSE, col="orange",
-     ylim=c(31.0, 34.0))
+     type = "b", ylim=c(31.0, 34.0))
 legend("bottomright", legend=c("Training", "Validation"),
        col=c("purple", "orange"), lty=1)
 dev.off()
