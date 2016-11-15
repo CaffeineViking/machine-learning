@@ -150,14 +150,26 @@
 
     Now we perform \emph{feature/variable selection} on the \emph{features Channel1-100} and \emph{target/response} of \emph{Fat}. By using \emph{stepAIC} on a linear model generated with \emph{R's lm}, a total of \emph{64 variables} were selected here. This is done in lines \texttt{66-67} in Listing~\ref{lst:script} (\emph{w.\ MASS}).
 
-    By using the \emph{Ridge regression model},
+    By using the \emph{Ridge regression model} on the same \emph{features} and \emph{response variables} with \emph{glmnet library}. Figure~\ref{fig:lasso_ridge} shows how \emph{coefficients} relate to the \emph{log $\lambda$}, \emph{the log penalty}. Notice how all coefficients \emph{converge uniformly} as \emph{higher penalty} is added to the model. This is being done in line \texttt{72} with $\lambda = 0.0$ (Ridge).
+
+    Thereafter, we use the \emph{LASSO regression model} with the same \emph{features and response variables}. See in Figure~\ref{fig:lasso_ridge} how the \emph{coefficients} converge \emph{iteratively} instead of \emph{simultaneously}, comparing toward \emph{Ridge}. This can be explained graphically within Figure~\ref{fig:shape}.
+
+    \begin{figure}[h!]
+        \centering
+        \caption{on the left we have \emph{Lasso} and right \emph{Ridge}. Notice, that \emph{Lasso} can set $w_1$ $\rightarrow$ zero much faster. Distributed under CC by Rezamohammadighazi.}
+        \label{fig:shape}
+        \includegraphics[width=0.5\textwidth]
+        {share/shape.jpg}
+    \end{figure}
+
+    Finally, we \emph{cross-validate} the \emph{Lasso model} with \emph{k-fold cross-validation} using the \emph{glmnet library}. By using $k = 20$ and using \emph{M.S.E.} as the metric, we find the last plot in Figure~\ref{fig:lasso_ridge} which shows that the chosen features (the dotted interval) are those that produce the lowest M.S.E. Which are the 14 selected features. This is shown in the lines \texttt{96-97} of Listing~\ref{lst:script}. Lastly, we compare these results with those found with \emph{stepAIC}. Notice how the \emph{Lasso model} with \emph{k-fold C.V.} produced a much lower number of selected features, 14, while \emph{stepAIC()} produced a total of 64. \emph{Lasso} gives us less features.
 
     \newpage
 
     \begin{figure}[h!]
         \centering
-        \label{fig:lasso_ridge}
         \caption{below are the relationships between the \emph{coefficients} and the \emph{$log(\lambda)$ penalty} for \emph{Ridge} and \emph{Lasso regression} (shown below in that exact order). Notice how \emph{Ridge} converges all of the \emph{coefficients simultaneously} while \emph{Lasso} does this step \emph{iteratively}, therefore, \emph{Lasso regression} should converge ``faster''. Finally, the bottom plot displays how a \emph{Lasso C.V.} relates to the increasing of \emph{penalty factor} of $log(\lambda)$.}
+        \label{fig:lasso_ridge}
         \includegraphics[width=0.35\textwidth]{share/ridge.eps}
         \includegraphics[width=0.35\textwidth]{share/lasso.eps}
         \includegraphics[width=0.35\textwidth]{share/kfold.eps}
