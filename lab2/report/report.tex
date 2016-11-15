@@ -74,10 +74,10 @@
             \STATE $\mathbf{y}_t \leftarrow \mathbf{y}_1 \cup \dots \cup \mathbf{y}_k - \mathbf{y}_i$ \COMMENT{Except fold $i$}
             \STATE $\mathbf{\hat{w}}_t \leftarrow (X_t^\intercal X^{}_t)^{-1} X_t^\intercal \mathbf{y}^{}_t$ \COMMENT{Train model}
             \STATE $\mathbf{\hat{y}}^{}_i \leftarrow X^{}_i \mathbf{\hat{w}}^{}_t$ \COMMENT{Predict target vector}
-            \STATE $\hat{\varepsilon}_i(\mathbf{\hat{y}}_t, \mathbf{y}_t) \leftarrow \frac{1}{n}\sum_{j=1}^{n}(\hat{y}_j - y_j)^2$
+            \STATE $\hat{\varepsilon}_i(\mathbf{\hat{y}}_i, \mathbf{y}_i) \leftarrow \frac{1}{n}\sum_{j=1}^{n}(\hat{y}_j - y_j)^2$
         \ENDFOR
 
-        \RETURN $(\sum_{i=1}^k{\hat{\varepsilon}_i(\mathbf{\hat{y}}_t, \mathbf{y}_t)}) \div k$
+        \RETURN $(\sum_{i=1}^k{\hat{\varepsilon}_i(\mathbf{\hat{y}}_i, \mathbf{y}_i)}) \div k$
     \end{algorithmic}
     \end{algorithm}
 
@@ -120,34 +120,48 @@
 
     \section*{Assignment 2}
 
+    By using the \emph{tecator dataset}, produced from observations on \emph{predicting fat content} simply by using an \emph{infrared absorbance spectrum} (w.\ several channels), we try to find relationships between their features.
+
     \begin{figure}[h!]
         \centering
-        \label{fig:linear}
         \caption{relationship seems very close to linear. \emph{Protein} and \emph{Moisture} seem to be related somehow, at least in the provided meat observation datasets.}
+        \label{fig:linear}
         \includegraphics[width=0.32\textwidth]
         {share/linear.eps}
     \end{figure}
 
-    \begin{equation} \label{eq:mse}
+    Now we consider models $M_i$ where \emph{Moisture} is \emph{normally distributed} and related to \emph{Protein} with a \emph{polynomial function} of steadily increasing degree. Equation~\ref{eq:poly} displays this relation, MSE in Figure~\ref{fig:depends}.
+
+    \begin{equation} \label{eq:poly}
         \mathrm{Moisture} \sim \mathcal{N}(w_0 + \sum_{i=1}^6{(w_i^i \cdot \mathrm{Protein}_i)}, \sigma^2)
     \end{equation}
 
     \begin{figure}[h!]
         \centering
-        \label{fig:depends}
         \caption{increasing complexity for the \emph{$i^{th}$ Model} seems to generate \emph{bias} towards the \emph{training dataset}, motivating the higher \emph{validation dataset} error rate.}
+        \label{fig:depends}
         \includegraphics[width=0.32\textwidth]
         {share/depends.eps}
     \end{figure}
 
-    % \begin{figure}[h!]
-    %     \centering
-    %     \label{fig:lasso_ridge}
-    %     \caption{below are the relationships between the \emph{coefficients} and the \emph{$log(\lambda)$ penalty} for \emph{Ridge} and \emph{Lasso regression} (shown below in that exact order). Notice how \emph{Ridge} converges all of the \emph{coefficients simultaneously} while \emph{Lasso} does this step \emph{iteratively}, therefore, \emph{Lasso regression} should converge ``faster''. Finally, the bottom plot displays how a \emph{Lasso C.V.} relates to the increasing of \emph{penalty factor} of $log(\lambda)$.}
-    %     \includegraphics[width=0.35\textwidth]{share/ridge.eps}
-    %     \includegraphics[width=0.35\textwidth]{share/lasso.eps}
-    %     \includegraphics[width=0.35\textwidth]{share/kfold.eps}
-    % \end{figure}
+    \newpage
+
+    It seems the model \emph{overfits} with more \emph{complexity}. The models $M_i$ and their \emph{M.S.E.}\ are calculated in lines \texttt{24-39} in Listing~\ref{lst:script}, the assignment 2 scripts. Also, according to the plot, the best model $M_i$ is located somewhere between $i = 1$ and $2$, where the lines intersect, producing the lowest M.S.E.\ for \emph{both datasets}, meaning there isn't \emph{bias} towards either $D$.
+
+    Now we perform \emph{feature/variable selection} on the \emph{features Channel1-100} and \emph{target/response} of \emph{Fat}. By using \emph{stepAIC} on a linear model generated with \emph{R's lm}, a total of \emph{64 variables} were selected here. This is done in lines \texttt{66-67} in Listing~\ref{lst:script} (\emph{w.\ MASS}).
+
+    By using the \emph{Ridge regression model},
+
+    \newpage
+
+    \begin{figure}[h!]
+        \centering
+        \label{fig:lasso_ridge}
+        \caption{below are the relationships between the \emph{coefficients} and the \emph{$log(\lambda)$ penalty} for \emph{Ridge} and \emph{Lasso regression} (shown below in that exact order). Notice how \emph{Ridge} converges all of the \emph{coefficients simultaneously} while \emph{Lasso} does this step \emph{iteratively}, therefore, \emph{Lasso regression} should converge ``faster''. Finally, the bottom plot displays how a \emph{Lasso C.V.} relates to the increasing of \emph{penalty factor} of $log(\lambda)$.}
+        \includegraphics[width=0.35\textwidth]{share/ridge.eps}
+        \includegraphics[width=0.35\textwidth]{share/lasso.eps}
+        \includegraphics[width=0.35\textwidth]{share/kfold.eps}
+    \end{figure}
 
     \clearpage \nocite{*}
     \bibliographystyle{alpha}
