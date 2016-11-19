@@ -1,25 +1,16 @@
 library("ggplot2")
 
 mu <- function(X)  { return(colMeans(X)) }
-sigma <- function(X, mu) {
-    distance <- X - mu
-    X <- data.matrix(X)
-    distance <- data.matrix(distance)
-    projection <- apply(distance, 1,
-             function(d) t(d) %*% d)
-    return(mean(projection))
-}
-
 softmax <- function(X, wi, wj) {
     X <- data.matrix(X)
-    ihypothesis <- exp(X %*% wi)
-    jhypothesis <- exp(X %*% wj)
+    ihypothesis <- exp(X %*% wi[-1] + wi[1])
+    jhypothesis <- exp(X %*% wj[-1] + wj[1])
     jhypothesis <- jhypothesis +
-                   exp(X %*% wi)
+                   exp(X %*% wi[-1] + wi[1])
     return(ihypothesis / jhypothesis)
 }
 
-lda <- function(X, y)   {
+lda <- function(X, y) {
     classes <- levels(y) # Only c = 2
     class1  <- which(y == classes[1])
     class2  <- which(y == classes[2])
@@ -31,26 +22,25 @@ lda <- function(X, y)   {
     mu1 <- mu(X1) ; mu2 <- mu(X2)
     pi1 <- length(y1) / length(y)
     pi2 <- length(y2) / length(y)
-    sigma1 <- sigma(X1, mu1)
-    sigma2 <- sigma(X2, mu2)
+    sigma <- cov(X1)*nrow(X1)+
+             cov(X2)*nrow(X2)
+    sigma <- sigma/nrow(X)
 
-    sigma <- sigma1*length(y1) +
-             sigma2*length(y2)
-    sigma <- sigma / length(y)
+    w01 <- (-(t(mu1)/2)) %*% solve(sigma) %*% mu1 + log(pi1)
+    wx1 <- solve(sigma) %*% mu1 # Some sort of magic.
+    w1 <- matrix(c(w01, wx1), 1, 3)
 
-    w01 <- t(mu1) * (1 / sigma) * mu1 + log(pi1)
-    w01 <- -(w01 / 2) # Needed, because of log..
-    wx1 <- (1 / sigma) * mu1 # Some like magic.
-    w1 <- matrix(c(w01, wx1), 2, 2)
+    w02 <- (-(t(mu2)/2)) %*% solve(sigma) %*% mu2 + log(pi2)
+    wx2 <- solve(sigma) %*% mu2 # Some magic here too.
+    w2 <- matrix(c(w02, wx2), 1, 3)
 
-    w02 <- t(mu2) * (1 / sigma) * mu2 + log(pi2)
-    w02 <- -(w02 / 2) # Needed, because of log..
-    wx2 <- (1 / sigma) * mu2 # Some magic here.
-    w2 <- matrix(c(w02, wx2), 2, 2)
-
+    Xm <- data.matrix(X)
     w1p <- softmax(X, w1, w2)
     w2p <- softmax(X, w2, w1)
-    # Fix softmax function.
+    y_hat <- w1p > w2p
+    y_hat[y_hat == TRUE] = "Male"
+    y_hat[y_hat == FALSE] = "Female"
+    return(y_hat)
 }
 
 crabs <- read.csv("crabs.csv")
