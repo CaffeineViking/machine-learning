@@ -10,6 +10,15 @@ sigma <- function(X, mu) {
     return(mean(projection))
 }
 
+softmax <- function(X, wi, wj) {
+    X <- data.matrix(X)
+    ihypothesis <- exp(X %*% wi)
+    jhypothesis <- exp(X %*% wj)
+    jhypothesis <- jhypothesis +
+                   exp(X %*% wi)
+    return(ihypothesis / jhypothesis)
+}
+
 lda <- function(X, y)   {
     classes <- levels(y) # Only c = 2
     class1  <- which(y == classes[1])
@@ -32,10 +41,16 @@ lda <- function(X, y)   {
     w01 <- t(mu1) * (1 / sigma) * mu1 + log(pi1)
     w01 <- -(w01 / 2) # Needed, because of log..
     wx1 <- (1 / sigma) * mu1 # Some like magic.
+    w1 <- matrix(c(w01, wx1), 2, 2)
 
     w02 <- t(mu2) * (1 / sigma) * mu2 + log(pi2)
     w02 <- -(w02 / 2) # Needed, because of log..
-    wx2 <- (1 / sigma) * mu2 # Some like magic.
+    wx2 <- (1 / sigma) * mu2 # Some magic here.
+    w2 <- matrix(c(w02, wx2), 2, 2)
+
+    w1p <- softmax(X, w1, w2)
+    w2p <- softmax(X, w2, w1)
+    # Fix softmax function.
 }
 
 crabs <- read.csv("crabs.csv")
