@@ -1,3 +1,4 @@
+library("glmnet")
 library("ggplot2")
 
 mu <- function(X)  { return(colMeans(X)) }
@@ -26,31 +27,53 @@ lda <- function(X, y) {
              cov(X2)*nrow(X2)
     sigma <- sigma/nrow(X)
 
-    w01 <- (-(t(mu1)/2)) %*% solve(sigma) %*% mu1 + log(pi1)
-    wx1 <- solve(sigma) %*% mu1 # Some sort of magic.
+    w01 <- -0.5 * mu1 %*% solve(sigma) %*% mu1 + log(pi1)
+    wx1 <- solve(sigma) %*% mu1 # Some sort of weird magic.
     w1 <- matrix(c(w01, wx1), 1, 3)
 
-    w02 <- (-(t(mu2)/2)) %*% solve(sigma) %*% mu2 + log(pi2)
-    wx2 <- solve(sigma) %*% mu2 # Some magic here too.
+    w02 <- -0.5 * mu2 %*% solve(sigma) %*% mu2 + log(pi2)
+    wx2 <- solve(sigma) %*% mu2 # Some more magic here too.
     w2 <- matrix(c(w02, wx2), 1, 3)
+    return(rbind(w1, w2)) # w1, w2.
+}
 
-    Xm <- data.matrix(X)
-    w1p <- softmax(X, w1, w2)
-    w2p <- softmax(X, w2, w1)
-    y_hat <- w1p > w2p
-    y_hat[y_hat == TRUE] = "Male"
-    y_hat[y_hat == FALSE] = "Female"
-    return(y_hat)
+classify <- function(X, d) {
+    return(d[1] + d[2]*X[,1] +
+                  d[3]*X[,2])
 }
 
 crabs <- read.csv("crabs.csv")
 X <- crabs[,c("CL", "RW")]
 y <- crabs[,c("sex")]
 
-# setEPS()
-# postscript("crabs.eps")
+setEPS()
+postscript("crabs.eps")
 print(qplot(CL, RW, data = crabs, color = sex,
       geom = c("point", "smooth"),
       xlab = "Carapace Length",
       ylab = "Rear Width"))
-# dev.off()
+dev.off()
+
+parameters <- lda(X, y)
+difference <- parameters[1,]-parameters[2,]
+intercept <- difference[1] / difference[3]
+slope <- difference[2] / difference[3]
+
+Sex <- classify(X, difference) > 0.0
+Sex[Sex == FALSE] = "Female"
+Sex[Sex == TRUE] = "Male"
+
+setEPS()
+postscript("boundary.eps")
+print(qplot(CL, RW, data = crabs, color = Sex,
+      geom = c("point"),
+      xlab = "Carapace Length",
+      ylab = "Rear Width") +
+      geom_abline(intercept = -intercept,
+                  slope = -slope, colour='purple'))
+dev.off()
+
+
+fit <- glmnet(data.matrix(X), y,
+              family="binomial")
+# TODO: plot this shit too...
