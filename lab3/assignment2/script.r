@@ -1,6 +1,7 @@
 library("tree")
 library("ggplot2")
 library("reshape2")
+library("e1071")
 
 set.seed(12345) # As always.....
 scores <- read.csv("scores.csv")
@@ -10,29 +11,37 @@ others <- setdiff(1:n, samples)
 halves <- sample(others, n/4.0)
 
 training <- scores[samples,]
+trainingX <- training[,-ncol(training)]
+trainingy <- training[,ncol(training)]
+
 validation <- scores[halves,]
+validationX <- validation[,-ncol(validation)]
+validationy <- validation[,ncol(validation)]
+
 testing  <- scores[-halves,]
+testingX <- testing[,-ncol(testing)]
+testingy <- testing[,ncol(testing)]
 
 fit <- tree(good_bad ~ ., data = training, split = c("deviance"))
-training_prediction <- predict(fit, training, type= "class")
-testing_prediction <- predict(fit, testing, type="class")
+training_prediction <- predict(fit, trainingX, type= "class")
+testing_prediction <- predict(fit, testingX, type="class")
 cat("Missclassifications only with deviance impurity: (",
-    mean(training_prediction != training$good_bad), "," ,
-    mean(testing_prediction != testing$good_bad), ")\n")
+    mean(training_prediction != trainingy), "," ,
+    mean(testing_prediction != testingy), ")\n")
 
 fit <- tree(good_bad ~ ., data = training, split = c("gini"))
-training_prediction <- predict(fit, training, type= "class")
-testing_prediction <- predict(fit, testing, type="class")
+training_prediction <- predict(fit, trainingX, type= "class")
+testing_prediction <- predict(fit, testingX, type="class")
 cat("Missclassifications only with the gini impurity: (",
-    mean(training_prediction != training$good_bad), "," ,
-    mean(testing_prediction != testing$good_bad), ")\n")
+    mean(training_prediction != trainingy), "," ,
+    mean(testing_prediction != testingy), ")\n")
 
 fit <- tree(good_bad ~ ., data = training, split = c("deviance", "gini"))
-training_prediction <- predict(fit, training, type= "class")
-testing_prediction <- predict(fit, testing, type="class")
+training_prediction <- predict(fit, trainingX, type= "class")
+testing_prediction <- predict(fit, testingX, type="class")
 cat("Missclassifications only with deviance and gini: (",
-    mean(training_prediction != training$good_bad), "," ,
-    mean(testing_prediction != testing$good_bad), ")\n")
+    mean(training_prediction != trainingy), "," ,
+    mean(testing_prediction != testingy), ")\n")
 
 max_depth <- 15
 training_deviance <- rep(0, max_depth)
@@ -48,9 +57,12 @@ deviances <- data.frame(2:max_depth, training_deviance[-1], validation_deviance[
 colnames(deviances) <- c("Leaves", "Training", "Validation")
 collapsed_deviances <- melt(deviances, id="Leaves")
 
+setEPS()
+postscript("crabs.eps")
 # It seems depth 12 is good, since validation goes hayware after that...
 print(ggplot(data=collapsed_deviances, aes(x=Leaves, y=value, color=variable)) +
       geom_smooth() + labs(x="Leaves", y="Deviance", color="Data Set"))
+dev.off()
 
 # The final tree has depth 6, see output of `final_tree`.
 # The parameters chosen are: savings, duration, history, age,
@@ -58,4 +70,14 @@ print(ggplot(data=collapsed_deviances, aes(x=Leaves, y=value, color=variable)) +
 final_tree <- prune.tree(fit, best = 12) # The best choice...
 prediction <- predict(final_tree, testing, type = "class")
 cat("Missclassification for the optimal tree depth: (",
-    mean(prediction != testing$good_bad), ")\n")
+    mean(prediction != testingy), ")\n")
+
+fit <- naiveBayes(good_bad ~ ., data = training)
+training_prediction <- predict(fit, training, type = "class")
+testing_prediction <- predict(fit, testing, type = "class")
+cat("Missclassifications using Naive Bayes method:  (",
+    mean(training_prediction != trainingy), "," ,
+    mean(testing_prediction != testingy), ")\n")
+cat("\nConfusion matrices for using Naive Bayes:\n")
+print(table(training_prediction, trainingy))
+print(table(testing_prediction, testingy))
