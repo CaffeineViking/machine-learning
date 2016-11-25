@@ -65,7 +65,7 @@ sex[sex == FALSE] = "Female"
 sex[sex == TRUE] = "Male"
 
 setEPS()
-cairo_ps("boundary.eps")
+cairo_ps("boundarylda.eps")
 print(qplot(CL, RW, data = crabs, color = sex,
       geom = c("point"),
       xlab = "Carapace Length",
@@ -73,3 +73,24 @@ print(qplot(CL, RW, data = crabs, color = sex,
       geom_abline(intercept = -intercept,
                   slope = -slope, colour='purple'))
 dev.off()
+
+fit <- cv.glmnet(data.matrix(X), data.matrix(y),
+    family = "binomial", type.measure = "class")
+yhat <- predict(fit, data.matrix(X), type="class")
+
+setEPS()
+cairo_ps("boundarylr.eps")
+print(qplot(X$CL, X$RW, color = yhat,
+      geom = c("point"),
+      xlab = "Carapace Length",
+      ylab = "Rear Width") +
+      geom_abline(intercept = -coef(fit)[1] / coef(fit)[3],
+                  slope = -coef(fit)[2] / coef(fit)[3],
+                  colour='purple'))
+dev.off()
+
+cat("Decision boundary with linear discriminant analysis:",
+    -intercept, "+", -slope, "* k\n")
+cat("Decision boundary with linear regression:",
+    -coef(fit)[1] / coef(fit)[3], "+",
+    -coef(fit)[2] / coef(fit)[3], "* k\n")
