@@ -73,6 +73,12 @@ prediction <- predict(final_tree, testing, type = "class")
 cat("Missclassification for the optimal tree depth: (",
     mean(prediction != testingy), ")\n")
 
+setEPS()
+cairo_ps("tree.eps")
+plot(final_tree)
+text(final_tree)
+dev.off()
+
 fit <- naiveBayes(good_bad ~ ., data = training)
 training_prediction <- predict(fit, training, type = "class")
 testing_prediction <- predict(fit, testing, type = "class")

@@ -67,7 +67,7 @@
         \end{split}
         \end{equation}
 
-        Finally, computing $\hat{\Sigma}$ is done by using these $\Sigma_k$, which is thereafter used to calculate $w_0$ and $\bm{w},\, \forall k$. Implementation of these formulae in \emph{R} can be found in Listing~\ref{lst:lda} under lines \texttt{15-39} i the \texttt{lda} function. All equations are in \emph{Friedman et al's}~\cite{friedman2009elements} book.
+        Finally, computing $\hat{\Sigma}$ is done by using these $\Sigma_k$, which is thereafter used to calculate $w_0$ and $\bm{w},\, \forall k$. Implementation of these formulae in \emph{R} can be found in Listing~\ref{lst:lda} under lines \texttt{15-39} in the \texttt{lda} function. All equations are in \emph{Friedman et al's}~\cite{friedman2009elements} book.
 
         \begin{equation} \label{eq:discfun}
         \begin{split}
@@ -86,7 +86,7 @@
 
         \clearpage
 
-        Thereafter, by using \emph{Logistic Regression} instead, Figure~\ref{fig:boundarylr} can be obtained, which is a bit different...
+        Thereafter, by using \emph{Logistic Regression} instead, Figure~\ref{fig:boundarylr} can be obtained, which misses predictions.
 
         \begin{table}[h!]
         \begin{center}
@@ -121,6 +121,29 @@
 
     \section*{Assignment 2}
 
+        Given several \emph{observations} from different \emph{customers} with certain \emph{features} and \emph{classifications} of whether they have \emph{managed their loans} \emph{good} or \emph{bad}, we are tasked to \emph{predict} if a new customer with certain set of features, will pay back their loans on time or not.
+
+        By using \emph{decision tree learning}, which maps observations (the branches) to their conclusions (the leaves), we can predict this aforementioned model. In Listing~\ref{lst:script} under the lines \texttt{26-45}, we use \texttt{tree} to fit our model for usage on \emph{training} \& \emph{testing} sets. These models can be fit using different measures of \emph{impurity}, where we only consider \emph{deviance} and the \emph{gini index} here. In Table~\ref{table:dectree} are the results for these. It seems that \emph{gini and/or deviance} classifies better.
+
+        \begin{table}[h!]
+        \begin{center}
+        \begin{tabular}{lll}
+            \toprule
+                \textbf{Data Set} & \textbf{Impurity Measure} & \textbf{Miss Rate} \\
+            \midrule
+                Training & Deviance & 0.212 \\
+                Testing & Deviance & 0.236 \\
+                Training & Gini & 0.230 \\
+                Testing & Gini & 0.282 \\
+                Training & Deviance \& Gini & 0.212 \\
+                Testing & Deviance \& Gini & 0.236 \\
+            \bottomrule
+        \end{tabular}
+        \end{center}
+        \caption{Decision Tree Missclassification Rates}
+        \label{table:dectree}
+        \end{table}
+
         \begin{figure}[h!]
             \centering
             \caption{Training and Validation Deviance Values}
@@ -128,7 +151,82 @@
             \includegraphics[width=0.5\textwidth]{share/deviance.eps}
         \end{figure}
 
-    \clearpage \nocite{*}
+        Afterwards, we use the \emph{training} and \emph{validation data sets} to choose the \emph{optimal tree depth}. Following lines \texttt{47-66}, we iteratively \emph{prune} the decision tree, essentially adding more \emph{leaves}, and thereafter plot the dependence on the \emph{number of leaves} and the \emph{estimated deviance of the model}. This plot can be seen in Figure~\ref{fig:deviance}. As can be seen, when more than 12 leaves are selected, the \emph{validation set} has a pretty large increase in \emph{deviance}, which isn't the desired behaviour. On the other hand, the \emph{training data set} has a constant decrease in deviance as the number of leaves increase. Therefore, the best number of leaves seems to be 12, giving best of both worlds. Additionally, the depth of this optimal tree is 6 and has a misclassification rate of 0.24 with the following features selected: \emph{savings, duration, history, age, purpose, amount, other and resident}, all of which can be found easy with \texttt{summary(tree)}.
+
+        Finally, the decision tree is plotted in Figure~\ref{fig:tree}. Most of the branches and their outcomes seem quite reasonable (with common sense), a person that has very few savings and has a history of usually delays loans, will probably be a bad customer who doesn't pay back them. While a person which has savings and is a resident will probably be more responsible and pay back his loans. It seems that the tree has been able to select the most important features as the branches of the decision tree, which are highly correlated with either classification result (the leaves). The depth can be seen here too.
+
+        \begin{figure}[h!]
+            \centering
+            \caption{Visualization of the Decision Tree}
+            \label{fig:tree}
+            \includegraphics[width=0.45\textwidth]{share/tree.eps}
+        \end{figure}
+
+        Now we proceed to fit another model with the same situation, but using \emph{Na{\"\i}ve Bayes} instead, which basically assumes that all \emph{features} are independent, like so: $p(C_k | x_1, x_2, ..., x_n) \propto p(x_i | C_k)$.
+
+        Under lines \texttt{82-90} we fit the model with \texttt{e1071}'s \texttt{naiveBayes} \emph{classification}, and produce the \emph{confusion matrices} and \emph{missclassifications} below for both the \emph{training} and the \emph{testing data sets}.
+
+        \emph{Missclassification:} \emph{train} = 0.300 \& \emph{test} = 0.306.
+
+
+        \begin{table}[h]
+        \begin{center}
+        \begin{tabular}{r|c|c|}
+            \multicolumn{1}{r}{\emph{train}}
+            &\multicolumn{1}{c}{\textbf{bad}}
+            &\multicolumn{1}{c}{\textbf{good}} \\
+            \cline{2-3}
+            \textbf{bad} & 95 & 98 \\
+            \cline{2-3}
+            \textbf{good} & 52 & 255 \\
+            \cline{2-3}
+        \end{tabular}
+        \begin{tabular}{r|c|c|}
+            \multicolumn{1}{r}{\emph{test}}
+            &\multicolumn{1}{c}{\textbf{bad}}
+            &\multicolumn{1}{c}{\textbf{good}} \\
+            \cline{2-3}
+            \textbf{bad} & 142 & 147 \\
+            \cline{2-3}
+            \textbf{good} & 83 & 378 \\
+            \cline{2-3}
+        \end{tabular}
+        \end{center}
+        \caption{Normal Na{\"\i}ve Bayes Confusion Matrix}
+        \label{table:bayes}
+        \end{table}
+
+        It seems that in this case, \emph{Na{\"\i}ve Bayes} performs worse than \emph{decision trees} since the missclassification rate is quite a bit higher. Now, let's assume that we are given a \emph{loss matrix}, a way of \emph{penalizing} the \emph{predictor} to apply weight to certain negatives, which in this case is $L = \left( \begin{smallmatrix}0&1\\10&0\end{smallmatrix} \right)$. Doing this in lines \texttt{92-109} results in a prediction giving the \emph{confusion matrix} below and missclassifications of train = 0.274 and test = 0.278. These missclassifications are a lot lower than those in the normal ``lossless'' model. The reason why this happens is because the cost of doing a faulty classification is highly penalized in one case (while the other isn't penalized as much), this is a underlying reason for these results.
+
+
+        \begin{table}[h]
+        \begin{center}
+        \begin{tabular}{r|c|c|}
+            \multicolumn{1}{r}{\emph{train}}
+            &\multicolumn{1}{c}{\textbf{bad}}
+            &\multicolumn{1}{c}{\textbf{good}} \\
+            \cline{2-3}
+            \textbf{bad} & 27 & 17 \\
+            \cline{2-3}
+            \textbf{good} & 120 & 336 \\
+            \cline{2-3}
+        \end{tabular}
+        \begin{tabular}{r|c|c|}
+            \multicolumn{1}{r}{\emph{test}}
+            &\multicolumn{1}{c}{\textbf{bad}}
+            &\multicolumn{1}{c}{\textbf{good}} \\
+            \cline{2-3}
+            \textbf{bad} & 40 & 24 \\
+            \cline{2-3}
+            \textbf{good} & 185 & 501 \\
+            \cline{2-3}
+        \end{tabular}
+        \end{center}
+        \caption{``Lossy'' Na{\"\i}ve Bayes Confusion Matrix}
+        \label{table:bayes10}
+        \end{table}
+
+    \nocite{*}
     \bibliographystyle{alpha}
     \bibliography{report}
 
