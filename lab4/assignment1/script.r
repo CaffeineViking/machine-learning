@@ -54,7 +54,7 @@ cairo_ps("bootstrap.eps")
 plot(bootstrap)
 dev.off()
 
-# Find model's confidence bands.
+#  Find model's confidence bands.
 confidence <- envelope(bootstrap)
 
 setEPS()
