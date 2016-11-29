@@ -8,7 +8,7 @@ state <- state[order(state$MET),]
 
 setEPS()
 cairo_ps("state.eps")
-print(qplot(EX, MET, data = state,
+print(qplot(MET, EX, data = state,
             geom = c("point")))
 dev.off()
 
@@ -28,7 +28,7 @@ dev.off()
 
 setEPS()
 cairo_ps("beststate.eps")
-print(qplot(EXhat, MET, data = state,
+print(qplot(MET, EXhat, data = state,
             geom = c("point")))
 dev.off()
 
@@ -46,6 +46,7 @@ bootfn <- function(data, indices) {
     return(EXhat)
 }
 
+# Apply bootstrap to our regression tree.
 bootstrap <- boot(state, bootfn, R = 1024)
 
 setEPS()
@@ -53,4 +54,12 @@ cairo_ps("bootstrap.eps")
 plot(bootstrap)
 dev.off()
 
-cb <- envelope(bootstrap)
+# Find model's confidence bands.
+confidence <- envelope(bootstrap)
+
+setEPS()
+cairo_ps("confbands.eps")
+print(qplot(MET, EXhat, data = state,
+            geom = c("point")) + geom_line(data = state, aes(x = MET, y = confidence$point[1,])) +
+                                 geom_line(data = state, aes(x = MET, y = confidence$point[2,])))
+dev.off()
