@@ -77,11 +77,3 @@ print(qplot(MET, yhat, data = state,
     geom = c("point")) + geom_line(data = state, aes(x = MET, y = bands$point[1,], col = "c.b")) +
                          geom_line(data = state, aes(x = MET, y = bands$point[2,], col = "c.b")))
 dev.off()
-
-standard_deviation <- sd(yhat)
-bootstrap_parametric <- function(data) {
-}
-
-bootstrap_normal <- function(data, mu) return(rnorm(nrow(data), mu, standard_deviation))
-bootstrap <- boot(state, bootstrap_parametric, R = 1024, sim = "parametric",
-                  ran.gen = bootstrap_normal)
