@@ -1,3 +1,4 @@
+library("pls")
 library("ggplot2")
 library("fastICA")
 library("reshape2")
@@ -19,8 +20,8 @@ biplot(principal_comp)
 dev.off()
 
 cairo_ps("score.eps")
-print(qplot(principal_comp$x[,2],
-            principal_comp$x[,1],
+print(qplot(principal_comp$x[,1],
+            principal_comp$x[,2],
             xlab = "X750",
             ylab = "X752"))
 dev.off()
@@ -50,18 +51,26 @@ x752whitening <- W[,2] # Un-mixed and whitened
 cairo_ps("x750traceplot.eps")
 print(qplot(1:length(x750whitening),
             x750whitening, xlab="i",
-            ylab="X750 Mystery???"))
+            ylab="X750 Inverse Loadings"))
 dev.off()
 
 cairo_ps("x752traceplot.eps")
 print(qplot(1:length(x752whitening),
             x752whitening, xlab="i",
-            ylab="X752 Mystery???"))
+            ylab="X752 Inverse Loadings"))
 dev.off()
 
 cairo_ps("icascore.eps")
-print(qplot(independent_comp$S[,2],
-            independent_comp$S[,1],
+print(qplot(independent_comp$S[,1],
+            independent_comp$S[,2],
             xlab = "X750",
             ylab = "X752"))
 dev.off()
+
+set.seed(12345)
+principal_compcv <- pcr(Viscosity ~ ., data = spectra,
+                        validation = "CV")
+# cairo_ps("pcacv.eps")
+validationplot(principal_compcv,
+               val.type = "MS")
+# dev.off()
