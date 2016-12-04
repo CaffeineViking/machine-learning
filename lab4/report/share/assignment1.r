@@ -13,7 +13,7 @@ cairo_ps("state.eps")
 print(qplot(MET, EX, data = state,
     xlab = "Metropolitan Population Ratio",
     ylab = "Capita/Public Expenditures ($)",
-    geom = c("point"), color = "observed"))
+    geom = c("point")))
 dev.off()
 
 set.seed(12345) # Required for cross-validation.
@@ -39,8 +39,7 @@ cairo_ps("predicted_state.eps")
 print(qplot(MET, yhat, data = state,
     xlab = "Metropolitan Population Ratio",
     ylab = "Capita/Public Expenditures ($)",
-    geom = c("point"), color = "predicted") +
-    geom_point(data = state, aes(MET, EX, color = "observed")))
+    geom = c("point")))
 dev.off()
 
 cairo_ps("histogram.eps")
@@ -71,15 +70,13 @@ dev.off()
 # Find the confidence bands.
 bands <- envelope(bootstrap)
 
-cairo_ps("npbands.eps")
+cairo_ps("bands.eps")
 # Plotting MET vs EX. See the file.
 print(qplot(MET, yhat, data = state,
     xlab = "Metropolitan Population Ratio",
     ylab = "Capita/Public Expenditures ($)",
-    geom = c("point"), color = "predicted") +
-    geom_line(data = state, aes(x = MET, y = bands$point[1,], col = "c.b")) +
-    geom_line(data = state, aes(x = MET, y = bands$point[2,], col = "c.b")) +
-    geom_point(data = state, aes(MET, EX, color = "observed")))
+    geom = c("point")) + geom_line(data = state, aes(x = MET, y = bands$point[1,], col = "c.b")) +
+                         geom_line(data = state, aes(x = MET, y = bands$point[2,], col = "c.b")))
 dev.off()
 
 bootstrap_prediction <- function(data) {
@@ -123,7 +120,7 @@ cairo_ps("nppbootstrap.eps")
 plot(bootstrapp)
 dev.off()
 
-cairo_ps("pbands.eps")
+cairo_ps("npbands.eps")
 # Plotting MET vs EX. See the file.
 print(qplot(MET, yhat, data = state,
     xlab = "Metropolitan Population Ratio",
@@ -133,5 +130,5 @@ print(qplot(MET, yhat, data = state,
                          geom_line(data = state, aes(x = MET, y = prediction_bands$point[2,], col = "p.b")) +
                          geom_line(data = state, aes(x = MET, y = confidence_bands$point[1,], col = "c.b")) +
                          geom_line(data = state, aes(x = MET, y = confidence_bands$point[2,], col = "c.b")) +
-                         geom_point(data = state, aes(x = MET, y = EX, color="observed")))
+                         geom_point(data = state, aes(x = MET, y = EX, color="real")))
 dev.off()

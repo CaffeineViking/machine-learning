@@ -23,7 +23,7 @@ cairo_ps("score.eps")
 print(qplot(principal_comp$x[,1],
             principal_comp$x[,2],
             xlab = "X750",
-            ylab = "X752", color = "score"))
+            ylab = "X752"))
 dev.off()
 
 x750loadings <- principal_comp$rotation[,1]
@@ -32,13 +32,13 @@ x752loadings <- principal_comp$rotation[,2]
 cairo_ps("x750loadings.eps")
 print(qplot(1:length(x750loadings),
             x750loadings, xlab="i",
-            ylab="X750 Loadings", color = "loading"))
+            ylab="X750 Loadings"))
 dev.off()
 
 cairo_ps("x752loadings.eps")
 print(qplot(1:length(x752loadings),
             x752loadings, xlab="i",
-            ylab="X752 Loadings", color = "loading"))
+            ylab="X752 Loadings"))
 dev.off()
 
 set.seed(12345) # But WHY?!?!?!??!?!?!?!
@@ -51,23 +51,20 @@ x752whitening <- W[,2] # Un-mixed and whitened
 cairo_ps("x750traceplot.eps")
 print(qplot(1:length(x750whitening),
             x750whitening, xlab="i",
-            ylab="X750 Inverse Loadings", color = "loading?"))
+            ylab="X750 Inverse Loadings"))
 dev.off()
 
 cairo_ps("x752traceplot.eps")
 print(qplot(1:length(x752whitening),
             x752whitening, xlab="i",
-            ylab="X752 Inverse Loadings", color = "loading?"))
+            ylab="X752 Inverse Loadings"))
 dev.off()
 
 cairo_ps("icascore.eps")
 print(qplot(independent_comp$S[,1],
             independent_comp$S[,2],
             xlab = "X750",
-            ylab = "X752", color = "ica") +
-      geom_point(aes(x = principal_comp$x[,1],
-                     principal_comp$x[,2],
-                     color = "pca")))
+            ylab = "X752"))
 dev.off()
 
 set.seed(12345)
