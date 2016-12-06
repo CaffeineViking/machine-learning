@@ -90,13 +90,13 @@ print(table(training_prediction, trainingy))
 print(table(testing_prediction, testingy))
 
 training_probability <- predict(fit, training, type = "raw")
-training_loss <- training_probability[,1] / training_probability[,2] > 10
+training_loss <- training_probability[,1]*10 > training_probability[,2]
 training_loss[training_loss == FALSE] = "good"
 training_loss[training_loss == TRUE] = "bad"
 training_loss <- as.factor(training_loss)
 
 testing_probability <- predict(fit, testing, type = "raw")
-testing_loss <- testing_probability[,1] / testing_probability[,2] > 10
+testing_loss <- testing_probability[,1]*10 > testing_probability[,2]
 testing_loss[testing_loss == FALSE] = "good"
 testing_loss[testing_loss == TRUE] = "bad"
 testing_loss <- as.factor(testing_loss)
