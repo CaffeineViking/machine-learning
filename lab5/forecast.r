@@ -23,7 +23,7 @@ forecast_kernel <- function(longitudes, latitudes,
                             days,   time_points) {
     location_distance <- distHaversine(c(longitudes[1], latitudes[1]),
                                        c(longitudes[2], latitudes[2]))
-    time_points <- abs(time_points[1] - time_points[2])
+    time_point_distance <- abs(time_points[1] - time_points[2])
     day_distance <- abs(days[1] - days[2])
 }
 
