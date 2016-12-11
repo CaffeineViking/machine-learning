@@ -52,7 +52,7 @@ forecast_kernel <- function(longitudes, latitudes,
     location_kernel <- gaussian_kernel(as.numeric(location_distance / 1572), 0.192)
     # cat("(", location_distance, day_distance, time_point_distance, ")",
     #     "=> (", location_kernel, day_kernel, time_point_kernel, ") \n")
-    return((day_kernel + location_kernel + time_point_kernel) / 3.0)
+    return((day_kernel + location_kernel + time_point_kernel))
 }
 
 forecast <- function(date, location, weather) {
@@ -78,7 +78,7 @@ forecast <- function(date, location, weather) {
             weighted_temperature <- similarities[i, j] * weather[i,]$air_temperature
             weighted_temperatures[j] <- weighted_temperatures[j] + weighted_temperature
         }
-        # Apply the Nadaraya–Watson kernel regression.
+        # Apply the Nadaraya-Watson kernel regression.
     } ; return(weighted_temperatures / total_kernel_sum)
 }
 
@@ -88,7 +88,7 @@ latitude <- if (!is.na(args[2])) as.numeric(args[2]) else 58.4274
 longitude <- if (!is.na(args[3])) as.numeric(args[3]) else 14.826
 temperatures <- forecast(day, c(longitude, latitude),
                          weather[indx,]) # Kill me...
-cat("Forecast (in °C) for the", as.character(day),
+cat("Forecast (in oC) for the", as.character(day),
     "at 04:00:00 - 24:00:00 in", longitude, latitude,
     "(longitude, latitude)\n")
 cat(temperatures, "\n")
