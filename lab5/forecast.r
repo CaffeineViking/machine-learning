@@ -92,3 +92,9 @@ cat("Forecast (in oC) for the", as.character(day),
     "at 04:00:00 - 24:00:00 in", longitude, latitude,
     "(longitude, latitude)\n")
 cat(temperatures, "\n")
+
+setEPS()
+cairo_ps("forecast")
+plot(clock, temperatures, xlab="Time of Day",
+                          ylab="Temperature Celsius")
+dev.off()

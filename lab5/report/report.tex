@@ -65,7 +65,7 @@
 
     Practically, the \emph{kernel} is calculated in Listing~\ref{lst:forecast} under \texttt{gaussian\_kernel} and the \emph{estimation} is being done in the function \texttt{forecast}. However, note that the final contributions use \texttt{forecast\_kernel}, which will be described now.
 
-    Below follows the applied \emph{distance functions}, which give the measured distance between a pair of \emph{locations}, \emph{times of the day}, and also \emph{dates of year}.
+    Below follows the applied \emph{distance functions}, which give the measured distance between a pair of \emph{locations}, \emph{times of the day}, and also \emph{dates of year}. These are used in \texttt{forecast\_kernel} for each respective \texttt{gaussian\_kernel} invocation. Additionally, these distances are \emph{normalized} to range in-between 0.0 - 1.0. See Listing~\ref{lst:forecast} for these values.
 
     \begin{equation*} \label{eq:location}
         d_l = r\, \mathrm{hav}^{-1}(h),\; \mathrm{hav}(\varphi) = \frac{1 - \cos\varphi}{2}
@@ -85,6 +85,36 @@
         \end{cases}
     \end{equation*}
 
+    Therefore, the final \texttt{forecast\_kernel} is being calculated as seen below, where $k_l$ uses the \emph{location distance}, $k_d$ the \emph{date distance} and $k_t$ \emph{time distance}.
+
+    \begin{equation*} \label{eq:forecast}
+        k_f(\bm{x}, \bm{x'}) = k_l(\bm{x}, \bm{x'}) + k_d(\bm{x}, \bm{x'}) + k_t(\bm{x}, \bm{x'})
+    \end{equation*}
+
+    Within Table~\ref{tab:spread} are our chosen $\sigma$/$h$ \emph{spread}/\emph{width}.
+
+    \begin{table}[h!]
+        \begin{center}
+            \begin{tabular}{lc}
+                \toprule
+                \textbf{Feature} & \textbf{Spread}\\
+                \midrule
+                Location & \(0.192\) \\
+                Day &      \(0.256\) \\
+                Time &     \(0.256\) \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{Kernel Width}
+        \label{tab:spread}
+    \end{table}
+
+    These have been chosen to decrease contribution, so for example \emph{locations} are not easily influenced...
+
+    \clearpage
+
+    Finally, we estimate $\bm{y}$ for \emph{2013-10-04} during the entire day in \emph{58.4274 latitude} and \emph{14.826 longitude}. See Table~\ref{tab:forecast} and Figure~\ref{fig:forecast} for the predicted results.
+
     \begin{table}[h!]
         \begin{center}
             \begin{tabular}{lc}
@@ -101,13 +131,26 @@
                 18:00 & 4.978578 \\
                 20:00 & 4.799737 \\
                 22:00 & 4.637349 \\
-                24:00 & 4.51275 \\
+                24:00 & 4.512750 \\
                 \bottomrule
             \end{tabular}
         \end{center}
         \caption{Forecast for 2013-11-04}
-        \label{table:forecast}
+        \label{tab:forecast}
     \end{table}
+
+    \begin{figure}[h!]
+        \centering
+        \caption{Air Temperature Forecast Graphs}
+        \label{fig:forecast}
+        \includegraphics[width=0.5\textwidth]{share/forecast.eps}
+    \end{figure}
+
+    Notice how the plot above produces a \emph{bell curve}, which is to be expected from a temperature forecast according to previous data given by \emph{SMHI}. Also, these values don't seem to be that far off the truth, however they seem to be slightly colder than usual. One possible cause for this can be motivated by the \emph{independence} of each \emph{kernel}, outweighing the other.
+
+    For example, assume both \emph{location} and \emph{time of day} are highly correlated to our $\bm{x'}$, therefore, they will \emph{contribute highly} with their $\bm{y^{(i)}}$. Now, for the sake of argument, assume \emph{day of the year} is \emph{not highly correlated} with $\bm{x'}$, therefore, the contribution $\bm{y^{(i)}}$ will not be significant, at least not compared to \emph{location} and \emph{time of day}. Therefore, even if we are taking an observation which is far away from the requested date, the contribution will still be high, which leads to most predictions being influenced with the ``mean'' temperatures in Sweden. Therefore, our hypothesis why most predictions are colder than expected is because the three kernels are being accounted independently of each other...
+
+    Additionally, some words need to be said regarding our choice for the \emph{kernel spread/width} values in Table~\ref{tab:spread}. These were chosen on the assumption that \emph{locations} further away than \emph{350 kilometers} are not very good contributors, as are \emph{dates} with a distance further away than \emph{45 days} and between \emph{$\approx$5 hours}. The $\sigma$ where chosen such that these values were reached, and only correlated less than $10 \%$, thereafter proceeding with normal Gaussian falloff.
 
     \nocite{*}
     \bibliographystyle{alpha}
