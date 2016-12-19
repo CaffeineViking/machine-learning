@@ -1,5 +1,5 @@
 name := report
-viewer := mupdf
+viewer := evince
 all: $(name).pdf
 view: $(name).pdf
 	$(viewer) $(name).pdf
