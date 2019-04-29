@@ -1,0 +1,7 @@
+lab1/report/* linguist-vendored
+lab2/report/* linguist-vendored
+lab3/report/* linguist-vendored
+lab4/report/* linguist-vendored
+lab5/report/* linguist-vendored
+lab6/report/* linguist-vendored
+*.eps         linguist-vendored
